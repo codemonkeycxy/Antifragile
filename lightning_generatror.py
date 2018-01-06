@@ -5,10 +5,6 @@ import math
 import random
 from PIL import Image, ImageDraw
 
-MAX_OFFSET = 100  # max offset from a lightning vertex
-FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
-LIGHTNING_COLOR = (250, 251, 165)
-
 
 class Coord(object):
     def __init__(self, x, y):
@@ -71,11 +67,18 @@ def to_quadruple(segment):
     return start.x, start.y, end.x, end.y
 
 
+MAX_OFFSET = 100  # max offset from a lightning vertex
+FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
+LIGHTNING_COLOR = (250, 251, 165)
+LIGHTNING_ORIGIN = Coord(10, 10)
+LIGHTNING_TAIL = Coord(500, 500)
+
+
 def main():
     background = Image.open("rainy_sky.jpg")
     draw = ImageDraw.Draw(background)
 
-    segments = [(Coord(10, 10), Coord(300, 300))]
+    segments = [(LIGHTNING_ORIGIN, LIGHTNING_TAIL)]
     offset = MAX_OFFSET
     for i in xrange(0, FIDELITY):
         new_segments = []
