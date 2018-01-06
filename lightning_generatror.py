@@ -5,8 +5,9 @@ import math
 import random
 from PIL import Image, ImageDraw
 
-MAX_OFFSET = 100
-LIGHTNING_COLOR = 128
+MAX_OFFSET = 100  # max offset from a lightning vertex
+FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
+LIGHTNING_COLOR = (250, 251, 165)
 
 
 class Coord(object):
@@ -76,7 +77,7 @@ def main():
 
     segments = [(Coord(10, 10), Coord(300, 300))]
     offset = MAX_OFFSET
-    for i in xrange(0, 10):
+    for i in xrange(0, FIDELITY):
         new_segments = []
 
         for segment in segments:
