@@ -27,6 +27,11 @@ class Coord(object):
     def __rmul__(self, factor):
         return self.__mul__(factor)
 
+    def __div__(self, factor):
+        # division factor must be a number
+        assert isinstance(factor, (int, long, float, complex))
+        return Coord(self.x / factor, self.y / factor)
+
     def __repr__(self):
         # Used to get human readable coordinates when printing
         return "Coord(%f,%f)" % (self.x, self.y)
@@ -61,13 +66,6 @@ def rotate(coord, rad_angle):
     )
 
 
-def find_mid(start, end):
-    return Coord(
-        (start.x + end.x) / 2,
-        (start.y + end.y) / 2
-    )
-
-
 def to_quadruple(segment):
     start, end = segment
     return start.x, start.y, end.x, end.y
@@ -93,7 +91,7 @@ def main():
 
         for segment in segments:
             start, end = segment
-            mid = find_mid(start, end)
+            mid = (start + end) / 2
 
             # give the current segment a slight twist along the perpendicular direction
             # 90 deg = pi/2 https://www.shodor.org/os411/courses/411a/module01/unit02/vector_degr.html
