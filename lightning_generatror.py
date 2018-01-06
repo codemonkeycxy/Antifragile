@@ -46,10 +46,11 @@ def normalize(coord):
     )
 
 
-def rotate(coord, angle):
+def rotate(coord, rad_angle):
+    # angle in radian: pi = 180 deg
     return Coord(
-        coord.length() * math.cos(coord.angle() + angle),
-        coord.length() * math.sin(coord.angle() + angle)
+        coord.length() * math.cos(coord.angle() + rad_angle),
+        coord.length() * math.sin(coord.angle() + rad_angle)
     )
 
 
@@ -88,6 +89,7 @@ def main():
             mid = find_mid(start, end)
 
             # give the current segment a slight twist along the perpendicular direction
+            # 90 deg = pi/2 https://www.shodor.org/os411/courses/411a/module01/unit02/vector_degr.html
             perpendicular = rotate(normalize(end - start), math.pi / 2)
             adjustment = random.uniform(-offset, offset)
 
