@@ -1,3 +1,4 @@
+# coding=utf-8
 # reference: http://drilian.com/2009/02/25/lightning-bolts
 # reference: https://stackoverflow.com/questions/16890711/normalise-and-perpendicular-function-in-python
 
@@ -48,9 +49,15 @@ def normalize(coord):
 
 def rotate(coord, rad_angle):
     # angle in radian: pi = 180 deg
+    new_angle = coord.angle() + rad_angle
+
+    # 2D vector rotation formula:
+    # x' = x cos θ − y sin θ
+    # y' = x sin θ + y cos θ
+    # https://stackoverflow.com/questions/14607640/rotating-a-vector-in-3d-space
     return Coord(
-        coord.length() * math.cos(coord.angle() + rad_angle),
-        coord.length() * math.sin(coord.angle() + rad_angle)
+        coord.x * math.cos(new_angle) - coord.y * math.sin(new_angle),
+        coord.x * math.sin(new_angle) + coord.y * math.cos(new_angle)
     )
 
 
