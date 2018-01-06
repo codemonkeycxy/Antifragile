@@ -71,22 +71,10 @@ def to_quadruple(segment):
     return start.x, start.y, end.x, end.y
 
 
-FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
-MAX_OFFSET = 100  # max offset from a lightning vertex
-BRANCH_LEN_SCALE = 0.7
-
-LIGHTNING_COLOR = (250, 251, 165)
-LIGHTNING_ORIGIN = Coord(10, 10)
-LIGHTNING_TAIL = Coord(500, 500)
-
-
-def main():
-    background = Image.open("rainy_sky.jpg")
-    draw = ImageDraw.Draw(background)
-
-    segments = [(LIGHTNING_ORIGIN, LIGHTNING_TAIL)]
-    offset = MAX_OFFSET
-    for i in xrange(0, FIDELITY):
+def generate_segments(init, num_of_refinements, max_offset):
+    segments = init
+    offset = max_offset
+    for _ in xrange(0, num_of_refinements):
         new_segments = []
 
         for segment in segments:
@@ -105,6 +93,22 @@ def main():
         segments = new_segments
         offset = offset / 2  # gradually reduce the adjustment effect
 
+    return segments
+
+
+FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
+MAX_OFFSET = 100  # max offset from a lightning vertex
+BRANCH_LEN_SCALE = 0.7
+
+LIGHTNING_COLOR = (250, 251, 165)
+LIGHTNING_ORIGIN = Coord(10, 10)
+LIGHTNING_TAIL = Coord(500, 500)
+
+def main():
+    background = Image.open("rainy_sky.jpg")
+    draw = ImageDraw.Draw(background)
+
+    segments = generate_segments([(LIGHTNING_ORIGIN, LIGHTNING_TAIL)], FIDELITY, MAX_OFFSET)
     for segment in segments:
         draw.line(to_quadruple(segment), fill=LIGHTNING_COLOR)
 
