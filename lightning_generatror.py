@@ -46,12 +46,10 @@ def normalize(coord):
     )
 
 
-def perpendicular(coord):
-    # Shifts the angle by pi/2 and calculate the coordinates
-    # using the original vector length
+def rotate(coord, angle):
     return Coord(
-        coord.length() * math.cos(coord.angle() + math.pi / 2),
-        coord.length() * math.sin(coord.angle() + math.pi / 2)
+        coord.length() * math.cos(coord.angle() + angle),
+        coord.length() * math.sin(coord.angle() + angle)
     )
 
 
@@ -67,8 +65,10 @@ def to_quadruple(segment):
     return start.x, start.y, end.x, end.y
 
 
-MAX_OFFSET = 100  # max offset from a lightning vertex
 FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
+MAX_OFFSET = 100  # max offset from a lightning vertex
+BRANCH_LEN_SCALE = 0.7
+
 LIGHTNING_COLOR = (250, 251, 165)
 LIGHTNING_ORIGIN = Coord(10, 10)
 LIGHTNING_TAIL = Coord(500, 500)
@@ -86,12 +86,17 @@ def main():
         for segment in segments:
             start, end = segment
             mid = find_mid(start, end)
-            mid += perpendicular(normalize(end - start)) * random.uniform(-offset, offset)
+
+            # give the current segment a slight twist along the perpendicular direction
+            perpendicular = rotate(normalize(end - start), math.pi / 2)
+            adjustment = random.uniform(-offset, offset)
+
+            mid += perpendicular * adjustment
             new_segments.append((start, mid))
             new_segments.append((mid, end))
 
         segments = new_segments
-        offset = offset / 2
+        offset = offset / 2  # gradually reduce the adjustment effect
 
     for segment in segments:
         draw.line(to_quadruple(segment), fill=LIGHTNING_COLOR)
