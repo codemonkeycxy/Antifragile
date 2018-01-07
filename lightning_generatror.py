@@ -76,8 +76,8 @@ LIGHTNING_ORIGIN = Coord(10, 10)
 LIGHTNING_TAIL = Coord(500, 500)
 
 
-def generate_segments(origin, tail):
-    segments = [origin, tail]
+def generate_lightning(origin, tail):
+    segments = [(origin, tail)]
     offset = MAX_OFFSET
     for _ in xrange(0, FIDELITY):
         new_segments = []
@@ -105,9 +105,25 @@ def main():
     background = Image.open("rainy_sky.jpg")
     draw = ImageDraw.Draw(background)
 
-    main_bolt = generate_segments(LIGHTNING_ORIGIN, LIGHTNING_TAIL)
-    for segment in main_bolt:
-        draw.line(to_quadruple(segment), fill=LIGHTNING_COLOR)
+    lightnings = []
+    main_bolt = generate_lightning(LIGHTNING_ORIGIN, LIGHTNING_TAIL)
+    lightnings.append(main_bolt)
+    
+    branch_cnt = random.randint(3, 6)
+    branch_pts = random.sample(set(main_bolt), branch_cnt)
+    for start, end in branch_pts:
+        branch_origin = end
+
+        rotation = random.choice([-1, 1]) * math.pi / 6  # +/-30 deg
+        direction = rotate_counter_clockwise((end - start).normalize(), rotation)
+        magnitude = (LIGHTNING_TAIL - branch_origin).length()
+
+        branch_end = branch_origin + direction * magnitude
+        lightnings.append(generate_lightning(branch_origin, branch_end))
+
+    for lightning in lightnings:
+        for segment in lightning:
+            draw.line(to_quadruple(segment), fill=LIGHTNING_COLOR)
 
     background.show()
     background.save('test.jpg', 'JPEG')
