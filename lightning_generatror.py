@@ -7,6 +7,12 @@ import random
 from PIL import Image, ImageDraw
 
 
+class Lightning(object):
+    def __init__(self, segments, intensity = 2):
+        self.segments = segments
+        self.intensity = intensity
+
+
 class Coord(object):
     def __init__(self, x, y):
         self.x = x
@@ -71,8 +77,9 @@ def to_quadruple(segment):
 MAX_OFFSET = 100  # max offset from a lightning vertex
 
 LIGHTNING_COLOR = (250, 251, 165)
-LIGHTNING_ORIGIN = Coord(10, 10)
-LIGHTNING_TAIL = Coord(500, 500)
+LIGHTNING_ORIGIN_X = random.randint(10, 300)
+LIGHTNING_ORIGIN = Coord(LIGHTNING_ORIGIN_X, 10)
+LIGHTNING_TAIL = Coord(LIGHTNING_ORIGIN_X + 500, 500)
 
 
 def generate_lightning(origin, tail):
@@ -100,7 +107,7 @@ def generate_lightning(origin, tail):
         segments = new_segments
         offset = offset / 2  # gradually reduce the adjustment effect
 
-    return segments
+    return Lightning(segments)
 
 
 def main():
@@ -109,10 +116,11 @@ def main():
 
     lightnings = []
     main_bolt = generate_lightning(LIGHTNING_ORIGIN, LIGHTNING_TAIL)
+    main_bolt.intensity = 3
     lightnings.append(main_bolt)
-    
+
     branch_cnt = random.randint(3, 6)
-    branch_pts = random.sample(set(main_bolt), branch_cnt)
+    branch_pts = random.sample(set(main_bolt.segments), branch_cnt)
     for start, end in branch_pts:
         branch_origin = end
 
@@ -127,8 +135,8 @@ def main():
         lightnings.append(generate_lightning(branch_origin, branch_end))
 
     for lightning in lightnings:
-        for segment in lightning:
-            draw.line(to_quadruple(segment), fill=LIGHTNING_COLOR)
+        for segment in lightning.segments:
+            draw.line(to_quadruple(segment), fill=LIGHTNING_COLOR, width=lightning.intensity)
 
     background.show()
     background.save('test.jpg', 'JPEG')
