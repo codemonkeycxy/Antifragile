@@ -44,12 +44,8 @@ class Coord(object):
         # Returns the vector's angle
         return math.atan2(self.y, self.x)
 
-
-def normalize(coord):
-    return Coord(
-        coord.x / coord.length(),
-        coord.y / coord.length()
-    )
+    def normalize(self):
+        return self / self.length()
 
 
 def rotate(coord, rad_angle):
@@ -71,10 +67,25 @@ def to_quadruple(segment):
     return start.x, start.y, end.x, end.y
 
 
-def generate_segments(init, num_of_refinements, max_offset):
-    segments = init
-    offset = max_offset
-    for _ in xrange(0, num_of_refinements):
+# main bolt constants
+FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
+MAX_OFFSET = 100  # max offset from a lightning vertex
+
+# branch constants
+MIN_BRANCH_ANGLE = math.pi / 9  # 10 deg
+MAX_BRANCH_ANGLE = math.pi / 3  # 30 deg
+BRANCH_LEN_SCALE = 0.7
+BRANCH_LIKELIHOOD = 0.2  # 20% chance to branch
+
+LIGHTNING_COLOR = (250, 251, 165)
+LIGHTNING_ORIGIN = Coord(10, 10)
+LIGHTNING_TAIL = Coord(500, 500)
+
+
+def generate_segments():
+    segments = [(LIGHTNING_ORIGIN, LIGHTNING_TAIL)]
+    offset = MAX_OFFSET
+    for _ in xrange(0, FIDELITY):
         new_segments = []
 
         for segment in segments:
@@ -83,12 +94,19 @@ def generate_segments(init, num_of_refinements, max_offset):
 
             # give the current segment a slight twist along the perpendicular direction
             # 90 deg = pi/2 https://www.shodor.org/os411/courses/411a/module01/unit02/vector_degr.html
-            perpendicular = rotate(normalize(end - start), math.pi / 2)
+            perpendicular = rotate((end - start).normalize(), math.pi / 2)
             adjustment = random.uniform(-offset, offset)
 
             mid += perpendicular * adjustment
             new_segments.append((start, mid))
             new_segments.append((mid, end))
+
+            if (1 - random.uniform(0, 1)) > BRANCH_LIKELIHOOD:
+                # add a branch
+                direction = mid - start
+                branch_angle = random.uniform(MIN_BRANCH_ANGLE, MAX_BRANCH_ANGLE)
+                branch_end = rotate(direction, branch_angle) * BRANCH_LEN_SCALE + mid
+                new_segments.append((mid, branch_end))
 
         segments = new_segments
         offset = offset / 2  # gradually reduce the adjustment effect
@@ -96,19 +114,11 @@ def generate_segments(init, num_of_refinements, max_offset):
     return segments
 
 
-FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
-MAX_OFFSET = 100  # max offset from a lightning vertex
-BRANCH_LEN_SCALE = 0.7
-
-LIGHTNING_COLOR = (250, 251, 165)
-LIGHTNING_ORIGIN = Coord(10, 10)
-LIGHTNING_TAIL = Coord(500, 500)
-
 def main():
     background = Image.open("rainy_sky.jpg")
     draw = ImageDraw.Draw(background)
 
-    segments = generate_segments([(LIGHTNING_ORIGIN, LIGHTNING_TAIL)], FIDELITY, MAX_OFFSET)
+    segments = generate_segments()
     for segment in segments:
         draw.line(to_quadruple(segment), fill=LIGHTNING_COLOR)
 
