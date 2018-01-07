@@ -117,7 +117,7 @@ def main():
         branch_origin = end
 
         rotation = random.choice([-1, 1]) * math.pi / 6  # +/-30 deg
-        direction = rotate_counter_clockwise((end - start).normalize(), rotation)
+        direction = rotate_counter_clockwise((end - LIGHTNING_ORIGIN).normalize(), rotation)
         magnitude = (LIGHTNING_TAIL - branch_origin).length()
 
         branch_end = branch_origin + direction * magnitude
