@@ -9,7 +9,7 @@ import random
 from PIL import Image, ImageDraw
 
 
-class Lightning(object):
+class LightningBolt(object):
     def __init__(self, segments, intensity = 2):
         self.segments = segments
         self.intensity = intensity
@@ -75,16 +75,12 @@ def to_quadruple(segment):
     return start.x, start.y, end.x, end.y
 
 
-# main bolt constants
+GIF_FRAMES_CNT = 50
 MAX_OFFSET = 100  # max offset from a lightning vertex
-
 LIGHTNING_COLOR = (250, 251, 165)
-LIGHTNING_ORIGIN_X = random.randint(10, 300)
-LIGHTNING_ORIGIN = Coord(LIGHTNING_ORIGIN_X, 10)
-LIGHTNING_TAIL = Coord(LIGHTNING_ORIGIN_X + random.randint(500, 700), 500)
 
 
-def generate_lightning(origin, tail):
+def generate_single_bolt(origin, tail):
     segments = [(origin, tail)]
     offset = MAX_OFFSET
     # figure out a reasonable number of refinement rounds for the lightning to look real
@@ -109,15 +105,16 @@ def generate_lightning(origin, tail):
         segments = new_segments
         offset = offset / 2  # gradually reduce the adjustment effect
 
-    return Lightning(segments)
+    return LightningBolt(segments)
 
 
-def main():
-    background = Image.open("rainy_sky.jpg")
-    draw = ImageDraw.Draw(background)
+def generate_lightnings():
+    lightning_origin_x = random.randint(10, 300)
+    lightning_origin = Coord(lightning_origin_x, 10)
+    lightning_tail = Coord(lightning_origin_x + random.randint(500, 700), 500)
 
     lightnings = []
-    main_bolt = generate_lightning(LIGHTNING_ORIGIN, LIGHTNING_TAIL)
+    main_bolt = generate_single_bolt(lightning_origin, lightning_tail)
     main_bolt.intensity = 3
     lightnings.append(main_bolt)
 
@@ -127,21 +124,39 @@ def main():
         branch_origin = end
 
         rotation = random.choice([-1, 1]) * math.pi / 6  # +/-30 deg
-        # this an intentional choice to use (LIGHTNING_ORIGIN, end) as the rotation baseline
+        # this an intentional choice to use (lightning_origin, end) as the rotation baseline
         # if we used (start, end) as a baseline, the segment is too tiny and the branch's rotation
         # tend to become totally off
-        direction = rotate_counter_clockwise((end - LIGHTNING_ORIGIN).normalize(), rotation)
-        magnitude = (LIGHTNING_TAIL - branch_origin).length()
+        direction = rotate_counter_clockwise((end - lightning_origin).normalize(), rotation)
+        magnitude = (lightning_tail - branch_origin).length()
 
         branch_end = branch_origin + direction * magnitude
-        lightnings.append(generate_lightning(branch_origin, branch_end))
+        lightnings.append(generate_single_bolt(branch_origin, branch_end))
+
+    return lightnings
+
+
+def draw_lightnings(background, lightnings):
+    draw = ImageDraw.Draw(background)
 
     for lightning in lightnings:
         for segment in lightning.segments:
             draw.line(to_quadruple(segment), fill=LIGHTNING_COLOR, width=lightning.intensity)
 
-    background.show()
-    background.save('test.jpg', 'JPEG')
+
+def main():
+    background = Image.open("rainy_sky.jpg")
+    frames = []
+
+    for i in xrange(0, GIF_FRAMES_CNT):
+        # make a copy of the background for new drawings
+        frame = background.copy()
+        draw_lightnings(frame, generate_lightnings())
+        frames.append(frame)
+        # add empty background for flashing lightning effect
+        frames.append(background)
+
+    background.save(fp='thor.gif', format='gif', save_all=True, append_images=frames)
 
 
 if __name__ == "__main__":
