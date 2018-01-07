@@ -1,6 +1,8 @@
 # coding=utf-8
 # reference: http://drilian.com/2009/02/25/lightning-bolts
 # reference: https://stackoverflow.com/questions/16890711/normalise-and-perpendicular-function-in-python
+# reference: https://gamedevelopment.tutsplus.com/tutorials/how-to-generate-shockingly-good-2d-lightning-effects--gamedev-2681
+# reference: http://www.mrcolson.com/2015/12/20/Simulating-Lightning-with-Python.html
 
 import math
 import random
