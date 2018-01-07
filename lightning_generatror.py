@@ -48,7 +48,7 @@ class Coord(object):
         return self / self.length()
 
 
-def rotate(coord, rad_angle):
+def rotate_counter_clockwise(coord, rad_angle):
     # angle in radian: pi = 180 deg
     new_angle = coord.angle() + rad_angle
 
@@ -72,8 +72,8 @@ FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
 MAX_OFFSET = 100  # max offset from a lightning vertex
 
 # branch constants
-MIN_BRANCH_ANGLE = math.pi / 9  # 10 deg
-MAX_BRANCH_ANGLE = math.pi / 3  # 30 deg
+MIN_BRANCH_ANGLE = math.pi * (2 / 3)  # 120 deg
+MAX_BRANCH_ANGLE = math.pi * (8 / 9)  # 160 deg
 BRANCH_LEN_DISSIPATION_FACTOR = 0.7  # branch should be shorter than the main bolt
 BRANCH_LIKELIHOOD = 0.2  # 20% chance to branch
 
@@ -94,7 +94,7 @@ def generate_segments():
 
             # give the current segment a slight twist along the perpendicular direction
             # 90 deg = pi/2 https://www.shodor.org/os411/courses/411a/module01/unit02/vector_degr.html
-            perpendicular = rotate((end - start).normalize(), math.pi / 2)
+            perpendicular = rotate_counter_clockwise((end - start).normalize(), math.pi / 2)
             adjustment = random.uniform(-offset, offset)
 
             mid += perpendicular * adjustment
@@ -105,7 +105,7 @@ def generate_segments():
                 # add a branch
                 direction = mid - start
                 branch_angle = random.uniform(MIN_BRANCH_ANGLE, MAX_BRANCH_ANGLE)
-                branch_end = rotate(direction, branch_angle) * BRANCH_LEN_DISSIPATION_FACTOR + mid
+                branch_end = rotate_counter_clockwise(direction, branch_angle) * BRANCH_LEN_DISSIPATION_FACTOR + mid
                 new_segments.append((mid, branch_end))
 
         segments = new_segments
