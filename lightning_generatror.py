@@ -74,7 +74,7 @@ MAX_OFFSET = 100  # max offset from a lightning vertex
 # branch constants
 MIN_BRANCH_ANGLE = math.pi / 9  # 10 deg
 MAX_BRANCH_ANGLE = math.pi / 3  # 30 deg
-BRANCH_LEN_SCALE = 0.7
+BRANCH_LEN_DISSIPATION_FACTOR = 0.7  # branch should be shorter than the main bolt
 BRANCH_LIKELIHOOD = 0.2  # 20% chance to branch
 
 LIGHTNING_COLOR = (250, 251, 165)
@@ -101,11 +101,11 @@ def generate_segments():
             new_segments.append((start, mid))
             new_segments.append((mid, end))
 
-            if (1 - random.uniform(0, 1)) > BRANCH_LIKELIHOOD:
+            if (1 - random.random()) > BRANCH_LIKELIHOOD:
                 # add a branch
                 direction = mid - start
                 branch_angle = random.uniform(MIN_BRANCH_ANGLE, MAX_BRANCH_ANGLE)
-                branch_end = rotate(direction, branch_angle) * BRANCH_LEN_SCALE + mid
+                branch_end = rotate(direction, branch_angle) * BRANCH_LEN_DISSIPATION_FACTOR + mid
                 new_segments.append((mid, branch_end))
 
         segments = new_segments
