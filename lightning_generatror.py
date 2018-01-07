@@ -81,7 +81,7 @@ MAX_OFFSET = 100  # max offset from a lightning vertex
 LIGHTNING_COLOR = (250, 251, 165)
 LIGHTNING_ORIGIN_X = random.randint(10, 300)
 LIGHTNING_ORIGIN = Coord(LIGHTNING_ORIGIN_X, 10)
-LIGHTNING_TAIL = Coord(LIGHTNING_ORIGIN_X + 500, 500)
+LIGHTNING_TAIL = Coord(LIGHTNING_ORIGIN_X + random.randint(500, 700), 500)
 
 
 def generate_lightning(origin, tail):
