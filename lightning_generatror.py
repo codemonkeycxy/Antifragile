@@ -101,7 +101,7 @@ def generate_segments():
             new_segments.append((start, mid))
             new_segments.append((mid, end))
 
-            if (1 - random.random()) > BRANCH_LIKELIHOOD:
+            if random.random() <= BRANCH_LIKELIHOOD:
                 # add a branch
                 direction = mid - start
                 branch_angle = random.uniform(MIN_BRANCH_ANGLE, MAX_BRANCH_ANGLE)
