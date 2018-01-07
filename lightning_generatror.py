@@ -68,7 +68,6 @@ def to_quadruple(segment):
 
 
 # main bolt constants
-FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
 MAX_OFFSET = 100  # max offset from a lightning vertex
 
 LIGHTNING_COLOR = (250, 251, 165)
@@ -79,7 +78,10 @@ LIGHTNING_TAIL = Coord(500, 500)
 def generate_lightning(origin, tail):
     segments = [(origin, tail)]
     offset = MAX_OFFSET
-    for _ in xrange(0, FIDELITY):
+    # figure out a reasonable number of refinement rounds for the lightning to look real
+    refinement_limit = int((tail - origin).length() / 80)
+
+    for _ in xrange(0, refinement_limit):
         new_segments = []
 
         for segment in segments:
