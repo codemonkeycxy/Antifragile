@@ -117,6 +117,9 @@ def main():
         branch_origin = end
 
         rotation = random.choice([-1, 1]) * math.pi / 6  # +/-30 deg
+        # this an intentional choice to use (LIGHTNING_ORIGIN, end) as the rotation baseline
+        # if we used (start, end) as a baseline, the segment is too tiny and the branch's rotation
+        # tend to become totally off
         direction = rotate_counter_clockwise((end - LIGHTNING_ORIGIN).normalize(), rotation)
         magnitude = (LIGHTNING_TAIL - branch_origin).length()
 
