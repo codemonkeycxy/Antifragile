@@ -71,12 +71,6 @@ def to_quadruple(segment):
 FIDELITY = 10  # larger number -> more realistic graphics -> slower rendering
 MAX_OFFSET = 100  # max offset from a lightning vertex
 
-# branch constants
-MIN_BRANCH_ANGLE = math.pi * (2 / 3)  # 120 deg
-MAX_BRANCH_ANGLE = math.pi * (8 / 9)  # 160 deg
-BRANCH_LEN_DISSIPATION_FACTOR = 0.7  # branch should be shorter than the main bolt
-BRANCH_LIKELIHOOD = 0.2  # 20% chance to branch
-
 LIGHTNING_COLOR = (250, 251, 165)
 LIGHTNING_ORIGIN = Coord(10, 10)
 LIGHTNING_TAIL = Coord(500, 500)
@@ -100,13 +94,6 @@ def generate_segments():
             mid += perpendicular * adjustment
             new_segments.append((start, mid))
             new_segments.append((mid, end))
-
-            if random.random() <= BRANCH_LIKELIHOOD:
-                # add a branch
-                direction = mid - start
-                branch_angle = random.uniform(MIN_BRANCH_ANGLE, MAX_BRANCH_ANGLE)
-                branch_end = rotate_counter_clockwise(direction, branch_angle) * BRANCH_LEN_DISSIPATION_FACTOR + mid
-                new_segments.append((mid, branch_end))
 
         segments = new_segments
         offset = offset / 2  # gradually reduce the adjustment effect
